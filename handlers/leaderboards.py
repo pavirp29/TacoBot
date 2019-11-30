@@ -45,7 +45,7 @@ def my_tacos_callback(bot, message):
 
 my_tacos_handler = MessageHandler(
                                   callback=my_tacos_callback,
-                                  filters=Filters.group & Filters.command('mytacos'))
+                                  filters=Filters.group & Filters.command(['mytacos', 'mytacos@HeyTacoBot']))
 
 
 def taco_top_callback(bot, message):
@@ -76,9 +76,15 @@ def taco_top_callback(bot, message):
 
     formatted_top = ''
     for user in top:
-        formatted_top += '{}. <b>{}</b> - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
-                                                                    user[0],
-                                                                    user[1])
+        if "@" in user[0]:
+            user_link = "https://t.me/{}".format(user[0][1:])
+        else:
+            user_link = "tg://user?id={}".format(user[0])
+
+        formatted_top += '{}. <html href="{}">{}</html> - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
+                                                                                           user_link,
+                                                                                           user[0][1:],
+                                                                                           user[1])
 
     bot.send_message(text=taco_top_phrase.format(len(top),
                                                  formatted_top),
@@ -88,4 +94,4 @@ def taco_top_callback(bot, message):
 
 
 taco_top_handler = MessageHandler(callback=taco_top_callback,
-                                  filters=Filters.group & Filters.command('tacotop'))
+                                  filters=Filters.group & Filters.command(['tacotop', 'tacotop@HeyTacoBot']))
