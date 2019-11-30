@@ -76,7 +76,7 @@ def taco_top_callback(bot, message):
 
     formatted_top = ''
     for user in top:
-        formatted_top += '{}. {} - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
+        formatted_top += '{}. <b>{}</b> - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
                                                                     user[0],
                                                                     user[1])
 
