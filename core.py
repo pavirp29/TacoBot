@@ -7,9 +7,9 @@ from handlers.setup import self_kick_handler, new_chat_handler
 from handlers.tacotransfers import chat_reply_handler, taco_mention_handler
 
 
-bot_token = config('BOT_TOKEN', default='token')
-api_id = config('API_ID', default='api_id')
-api_hash = config('API_HASH', default='api_hash')
+bot_token = config('BOT_TOKEN')
+api_id = config('API_ID', cast=int)
+api_hash = config('API_HASH')
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.getLevelName(config('LOG_LEVEL', default='INFO')))

@@ -81,7 +81,7 @@ def taco_top_callback(bot, message):
         else:
             user_link = "tg://user?id={}".format(user[0])
 
-        formatted_top += '{}. <html href="{}">{}</html> - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
+        formatted_top += '{}. <a href="{}">{}</a> - <code>{}</code> tacos!\n'.format(top.index(user) + 1,
                                                                                            user_link,
                                                                                            user[0][1:],
                                                                                            user[1])
