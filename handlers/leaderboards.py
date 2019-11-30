@@ -90,7 +90,8 @@ def taco_top_callback(bot, message):
                                                  formatted_top),
                      chat_id=cid,
                      reply_to_message_id=mid,
-                     parse_mode='html')
+                     parse_mode='html',
+                     disable_web_page_preview=True)
 
 
 taco_top_handler = MessageHandler(callback=taco_top_callback,
