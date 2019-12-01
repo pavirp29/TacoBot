@@ -37,6 +37,7 @@ def store_name(message):
     user = Usernames.select().where(Usernames.uid == uid)
 
     if user.exists():
+        user = user.get()
         user.name = name
         user.username = username
         user.save()
