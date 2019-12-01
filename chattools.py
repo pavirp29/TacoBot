@@ -72,8 +72,9 @@ def ensure_no_at_sign(name: str):
     return name.lstrip('@')
 
 
-def clean_chat(mids, cid, bot):
+def clean_chat(mids, cid, message, bot):
     mids = json.loads(mids)
+    mids.append(message.message_id)
     try:
         bot.delete_messages(chat_id=cid,
                             message_ids=mids)

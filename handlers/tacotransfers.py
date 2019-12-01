@@ -1,7 +1,7 @@
 import json
 import re
 from decouple import config
-from pyrogram import Filters, MessageHandler
+from pyrogram import Filters, MessageHandler, InlineKeyboardMarkup, InlineKeyboardButton
 from dbmodels import Tacos, Chats
 from filters import filter_taco, filter_mention
 from phrases import (
@@ -26,7 +26,10 @@ def give_tacos(bot, message, sender, receiver):
     tacos = Tacos.get(Tacos.chat == cid)
 
     chat = Chats.get(Chats.cid == message.chat.id)
-    clean_chat(chat.mids, chat.cid, bot)
+    clean_chat(chat.mids, chat.cid, message, bot)
+
+    ok_button = InlineKeyboardButton('OK', callback_data='delete:{}'.format(message.from_user.id))
+    ok_keyboard = InlineKeyboardMarkup([[ok_button]])
 
     if receiver.username is None:
         first_name = receiver.first_name
@@ -46,6 +49,7 @@ def give_tacos(bot, message, sender, receiver):
         mid = bot.send_message(chat_id=cid,
                          text=text,
                          reply_to_message_id=get_mid(message),
+                               reply_markup=ok_keyboard,
                          parse_mode='html').message_id
 
         chat.mids = json.dumps([mid])
@@ -114,6 +118,7 @@ def give_tacos(bot, message, sender, receiver):
 
     mid = bot.send_message(chat_id=cid,
                      text=taco_transfer_phrase.format(tacos_sent, receiver_name, comment),
+                           reply_markup=ok_keyboard,
                      reply_to_message_id=get_mid(message),
                      parse_mode='html').message_id
 
@@ -130,7 +135,7 @@ def chat_reply_callback(bot, message):
     store_name(message)
 
     chat = Chats.get(Chats.cid == message.chat.id)
-    clean_chat(chat.mids, chat.cid, bot)
+    clean_chat(chat.mids, chat.cid, message, bot)
 
     sender = message.from_user
     receiver = message.reply_to_message.from_user
@@ -150,7 +155,10 @@ def taco_mention_callback(bot, message):
     store_name(message)
 
     chat = Chats.get(Chats.cid == message.chat.id)
-    clean_chat(chat.mids, chat.cid, bot)
+    clean_chat(chat.mids, chat.cid, message, bot)
+
+    ok_button = InlineKeyboardButton('OK', callback_data='delete:{}'.format(message.from_user.id))
+    ok_keyboard = InlineKeyboardMarkup([[ok_button]])
 
     mentioned_users = list()
     for entity in message.entities:
@@ -167,6 +175,7 @@ def taco_mention_callback(bot, message):
         mid = bot.send_message(chat_id=cid,
                          text=text,
                          reply_to_message_id=get_mid(message),
+                               reply_markup=ok_keyboard,
                          parse_mode='html').message_id
 
         chat.mids = json.dumps([mid])
@@ -189,6 +198,7 @@ def taco_mention_callback(bot, message):
         mid = bot.send_message(chat_id=cid,
                          text=text.format(ensure_username(receiver_username)),
                          reply_to_message_id=get_mid(message),
+                               reply_markup=ok_keyboard,
                          parse_mode='html').message_id
 
         chat.mids = json.dumps([mid])

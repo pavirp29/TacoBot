@@ -1,6 +1,6 @@
 import json
 from decouple import config
-from pyrogram import MessageHandler, Filters
+from pyrogram import MessageHandler, Filters, InlineKeyboardButton, InlineKeyboardMarkup
 from dbmodels import Tacos, Chats
 from phrases import balance_phrase, balance_comment_medium, balance_comment_high, balance_comment_low,\
     taco_top_phrase, empty_top_phrase
@@ -15,12 +15,15 @@ def my_tacos_callback(bot, message):
     cid = get_cid(message)
     chat = Chats.get(Chats.cid == message.chat.id)
 
-    clean_chat(chat.mids, chat.cid, bot)
+    clean_chat(chat.mids, chat.cid, message, bot)
 
     store_name(message)
 
     uid = str(get_uid(message))
     tacos = Tacos.get(Tacos.chat == cid)
+
+    ok_button = InlineKeyboardButton('OK', callback_data='delete:{}'.format(message.from_user.id))
+    ok_keyboard = InlineKeyboardMarkup([[ok_button]])
 
     balances = json.loads(tacos.taco_balance)
 
@@ -46,6 +49,7 @@ def my_tacos_callback(bot, message):
                            text=balance_phrase.format(balance,
                                                       comment),
                            reply_to_message_id=get_mid(message),
+                           reply_markup=ok_keyboard,
                            parse_mode='html').message_id
 
     chat.mids = json.dumps([mid])
@@ -65,7 +69,10 @@ def taco_top_callback(bot, message):
     store_name(message)
 
     chat = Chats.get(Chats.cid == message.chat.id)
-    clean_chat(chat.mids, chat.cid, bot)
+    clean_chat(chat.mids, chat.cid, message, bot)
+
+    ok_button = InlineKeyboardButton('OK', callback_data='delete:{}'.format(message.from_user.id))
+    ok_keyboard = InlineKeyboardMarkup([[ok_button]])
 
     tacos = Tacos.get(Tacos.chat == cid)
 
@@ -75,6 +82,7 @@ def taco_top_callback(bot, message):
         bot.send_message(text=empty_top_phrase,
                          chat_id=cid,
                          reply_to_message_id=mid,
+                         reply_markup=ok_keyboard,
                          parse_mode='html')
         return
 
@@ -102,6 +110,7 @@ def taco_top_callback(bot, message):
                                                        formatted_top),
                            chat_id=cid,
                            reply_to_message_id=mid,
+                           reply_markup=ok_keyboard,
                            parse_mode='html',
                            disable_web_page_preview=True).message_id
 
