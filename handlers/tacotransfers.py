@@ -205,3 +205,13 @@ taco_mention_handler = MessageHandler(
     & filter_taco
     & filter_mention
 )
+
+
+def tacoinflator():
+    for chat in Tacos.select():
+        chat = chat.get()
+        tacos = json.loads(chat.taco_balance)
+        for user in tacos:
+            tacos.update({user: tacos.get(user) + 15})
+        chat.taco_balance = json.dumps(tacos)
+        chat.save()
