@@ -2,7 +2,7 @@ import json
 import re
 from decouple import config
 from pyrogram import Filters, MessageHandler
-from dbmodels import Tacos
+from dbmodels import Tacos, Chats
 from filters import filter_taco, filter_mention
 from phrases import (
     taco_transfer_phrase,
@@ -16,7 +16,7 @@ from phrases import (
     only_one_receiver_phrase,
     user_not_present_phrase
 )
-from chattools import store_name, get_cid, ensure_no_at_sign, ensure_username, get_mid
+from chattools import store_name, get_cid, ensure_no_at_sign, ensure_username, get_mid, clean_chat
 
 default_taco_amount = config('DEFAULT_TACOS', default=50, cast=int)
 
@@ -24,6 +24,9 @@ default_taco_amount = config('DEFAULT_TACOS', default=50, cast=int)
 def give_tacos(bot, message, sender, receiver):
     cid = get_cid(message)
     tacos = Tacos.get(Tacos.chat == cid)
+
+    chat = Chats.get(Chats.cid == message.chat.id)
+    clean_chat(chat.mids, chat.cid, bot)
 
     if receiver.username is None:
         first_name = receiver.first_name
@@ -78,13 +81,15 @@ def give_tacos(bot, message, sender, receiver):
         {sender_id: amounts.get(sender_id) - tacos_sent}
     )
     amounts.update({receiver_id: amounts.get(receiver_id) + tacos_sent})
-
-    if tacos_sent < 3:
-        comment = taco_transfer_comment_low
-    elif tacos_sent > 9:
-        comment = taco_transfer_comment_high
+    if chat.less is True:
+        comment = ''
     else:
-        comment = taco_transfer_comment_medium.format(receiver_name)
+        if tacos_sent < 3:
+            comment = taco_transfer_comment_low
+        elif tacos_sent > 9:
+            comment = taco_transfer_comment_high
+        else:
+            comment = taco_transfer_comment_medium.format(receiver_name)
 
     bot.send_message(chat_id=cid,
                      text=taco_transfer_phrase.format(tacos_sent, receiver_name, comment),
@@ -99,6 +104,9 @@ def chat_reply_callback(bot, message):
     """ callback for taco-transfer """
 
     store_name(message)
+
+    chat = Chats.get(Chats.cid == message.chat.id)
+    clean_chat(chat.mids, chat.cid, bot)
 
     sender = message.from_user
     receiver = message.reply_to_message.from_user
@@ -116,6 +124,10 @@ def taco_mention_callback(bot, message):
 
     cid = get_cid(message)
     store_name(message)
+
+    chat = Chats.get(Chats.cid == message.chat.id)
+    clean_chat(chat.mids, chat.cid, bot)
+
     mentioned_users = list()
     for entity in message.entities:
         if entity.type == 'mention':

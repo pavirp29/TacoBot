@@ -20,28 +20,33 @@ def store_name(message):
     """ this function is here only for /tacotop """
 
     uid = get_uid(message)
+    user_data = message.from_user
 
-    username = Usernames.select().where(Usernames.uid == uid)
-    if username.exists():
-        return username.get().name
-
-    user = message.from_user
-    if user.username is None:
+    if user_data.username is None:
         username = None
-        first_name = user.first_name
-        last_name = user.last_name
+        first_name = user_data.first_name
+        last_name = user_data.last_name
         if last_name is None:
             name = first_name
         else:
             name = first_name + ' ' + last_name
     else:
-        name = '@' + user.username
-        username = user.username.lower()
+        name = '@' + user_data.username
+        username = user_data.username.lower()
 
-    Usernames.create(
-        uid=uid,
-        name=name,
-        username=username)
+    user = Usernames.select().where(Usernames.uid == uid)
+
+    if username.exists():
+        user.name = name
+        user.username = username
+        user.save()
+
+    else:
+        Usernames.create(
+            uid=uid,
+            name=name,
+            username=username)
+
     return name
 
 
@@ -63,3 +68,12 @@ def ensure_username(name: str):
 
 def ensure_no_at_sign(name: str):
     return name.lstrip('@')
+
+
+def clean_chat(mids, cid, bot):
+    try:
+        bot.delete_messages(chat_id=cid,
+                            message_ids=mids)
+    except Exception as e:
+        print(e)
+        pass

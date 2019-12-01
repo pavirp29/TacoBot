@@ -35,3 +35,12 @@ def store_names_callback(bot, message):
 
 
 store_names_handler = MessageHandler(callback=store_names_callback)
+
+
+def less_callback(bot, message):
+    print(message.from_user)
+    pass
+
+
+less_handler = MessageHandler(callback=less_callback,
+                              filters=Filters.command('tacosilence') & Filters.group)

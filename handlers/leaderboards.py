@@ -4,7 +4,7 @@ from pyrogram import MessageHandler, Filters
 from dbmodels import Tacos, Chats
 from phrases import balance_phrase, balance_comment_medium, balance_comment_high, balance_comment_low,\
     taco_top_phrase, empty_top_phrase
-from chattools import get_uid, store_name, get_cid, resolve_name, get_mid
+from chattools import get_uid, store_name, get_cid, resolve_name, get_mid, clean_chat
 
 default_taco_amount = config('DEFAULT_TACOS', default=50, cast=int)
 
@@ -13,6 +13,9 @@ def my_tacos_callback(bot, message):
     """ shows users taco-balance """
 
     cid = get_cid(message)
+    chat = Chats.get(Chats.cid == message.chat.id)
+
+    clean_chat(chat.mids, chat.cid, bot)
 
     store_name(message)
 
@@ -29,12 +32,15 @@ def my_tacos_callback(bot, message):
         tacos.save()
         balance = default_taco_amount
 
-    if balance < 25:
-        comment = balance_comment_low
-    elif balance > 60:
-        comment = balance_comment_high
+    if chat.less is True:
+        comment = ''
     else:
-        comment = balance_comment_medium
+        if balance < 25:
+            comment = balance_comment_low
+        elif balance > 60:
+            comment = balance_comment_high
+        else:
+            comment = balance_comment_medium
 
     bot.send_message(chat_id=cid,
                      text=balance_phrase.format(balance,
@@ -54,6 +60,9 @@ def taco_top_callback(bot, message):
     cid = get_cid(message)
     mid = get_mid(message)
     store_name(message)
+
+    chat = Chats.get(Chats.cid == message.chat.id)
+    clean_chat(chat.mids, chat.cid, bot)
 
     tacos = Tacos.get(Tacos.chat == cid)
 
