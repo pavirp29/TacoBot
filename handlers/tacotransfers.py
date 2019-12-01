@@ -39,20 +39,34 @@ def give_tacos(bot, message, sender, receiver):
         receiver_name = "@" + receiver.username
 
     if receiver.is_bot:  # no tacos for bots
-        bot.send_message(chat_id=cid,
-                         text=no_bots_allowed_phrase,
+        if chat.less is True:
+            text = no_bots_allowed_phrase.split('\n')[0]
+        else:
+            text = no_bots_allowed_phrase
+        mid = bot.send_message(chat_id=cid,
+                         text=text,
                          reply_to_message_id=get_mid(message),
-                         parse_mode='html')
+                         parse_mode='html').message_id
+
+        chat.mids = json.dumps([mid])
+        chat.save()
         return
 
     sender_id = str(sender.id)
     receiver_id = str(receiver.id)
 
     if sender_id == receiver_id:  # self-tacoing is forbidden
-        bot.send_message(chat_id=cid,
-                         text=self_tacoing_phrase,
+        if chat.less is True:
+            text = self_tacoing_phrase.split('\n')[0]
+        else:
+            text = self_tacoing_phrase
+        mid = bot.send_message(chat_id=cid,
+                         text=text,
                          reply_to_message_id=get_mid(message),
-                         parse_mode='html')
+                         parse_mode='html').message_id
+
+        chat.mids = json.dumps([mid])
+        chat.save()
         return
 
     tacos_sent = len(
@@ -71,10 +85,17 @@ def give_tacos(bot, message, sender, receiver):
             amounts.update({receiver_id: default_taco_amount})
 
     if tacos_sent > amounts.get(sender_id):  # can't send more than you have
-        bot.send_message(chat_id=cid,
-                         text=balance_low_phrase,
+        if chat.less is True:
+            text = balance_low_phrase.split('\n')[0]
+        else:
+            text = balance_low_phrase
+        mid = bot.send_message(chat_id=cid,
+                         text=text,
                          reply_to_message_id=get_mid(message),
-                         parse_mode='html')
+                         parse_mode='html').message_id
+
+        chat.mids = json.dumps([mid])
+        chat.save()
         return
 
     amounts.update(
@@ -91,10 +112,13 @@ def give_tacos(bot, message, sender, receiver):
         else:
             comment = taco_transfer_comment_medium.format(receiver_name)
 
-    bot.send_message(chat_id=cid,
+    mid = bot.send_message(chat_id=cid,
                      text=taco_transfer_phrase.format(tacos_sent, receiver_name, comment),
                      reply_to_message_id=get_mid(message),
-                     parse_mode='html')
+                     parse_mode='html').message_id
+
+    chat.mids = json.dumps([mid])
+    chat.save()
 
     tacos.taco_balance = json.dumps(amounts)  # saving data
     tacos.save()
@@ -136,10 +160,17 @@ def taco_mention_callback(bot, message):
     mentioned_users = list(set(mentioned_users))   # removing duplicates
 
     if len(mentioned_users) > 1:
-        bot.send_message(chat_id=cid,
-                         text=only_one_receiver_phrase,
+        if chat.less is True:
+            text = only_one_receiver_phrase.split('\n')[0]
+        else:
+            text = only_one_receiver_phrase
+        mid = bot.send_message(chat_id=cid,
+                         text=text,
                          reply_to_message_id=get_mid(message),
-                         parse_mode='html')
+                         parse_mode='html').message_id
+
+        chat.mids = json.dumps([mid])
+        chat.save()
         return
 
     sender = message.from_user
@@ -151,10 +182,17 @@ def taco_mention_callback(bot, message):
 
     except Exception:
         """ here should be except UserNotParticipant, but it still raises this exception """
-        bot.send_message(chat_id=cid,
-                         text=user_not_present_phrase.format(ensure_username(receiver_username)),
+        if chat.less is True:
+            text = user_not_present_phrase.split('\n')[0]
+        else:
+            text = user_not_present_phrase
+        mid = bot.send_message(chat_id=cid,
+                         text=text.format(ensure_username(receiver_username)),
                          reply_to_message_id=get_mid(message),
-                         parse_mode='html')
+                         parse_mode='html').message_id
+
+        chat.mids = json.dumps([mid])
+        chat.save()
 
         return
 

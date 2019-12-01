@@ -42,11 +42,14 @@ def my_tacos_callback(bot, message):
         else:
             comment = balance_comment_medium
 
-    bot.send_message(chat_id=cid,
-                     text=balance_phrase.format(balance,
-                                                comment),
-                     reply_to_message_id=get_mid(message),
-                     parse_mode='html')
+    mid = bot.send_message(chat_id=cid,
+                           text=balance_phrase.format(balance,
+                                                      comment),
+                           reply_to_message_id=get_mid(message),
+                           parse_mode='html').message_id
+
+    chat.mids = json.dumps([mid])
+    chat.save()
 
 
 my_tacos_handler = MessageHandler(
@@ -95,12 +98,15 @@ def taco_top_callback(bot, message):
                                                                                            user[0][1:],
                                                                                            user[1])
 
-    bot.send_message(text=taco_top_phrase.format(len(top),
-                                                 formatted_top),
-                     chat_id=cid,
-                     reply_to_message_id=mid,
-                     parse_mode='html',
-                     disable_web_page_preview=True)
+    mid = bot.send_message(text=taco_top_phrase.format(len(top),
+                                                       formatted_top),
+                           chat_id=cid,
+                           reply_to_message_id=mid,
+                           parse_mode='html',
+                           disable_web_page_preview=True).message_id
+
+    chat.mids = json.dumps([mid])
+    chat.save()
 
 
 taco_top_handler = MessageHandler(callback=taco_top_callback,

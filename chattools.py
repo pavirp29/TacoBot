@@ -1,4 +1,5 @@
 from dbmodels import Usernames
+import json
 
 
 def get_uid(message):
@@ -72,6 +73,7 @@ def ensure_no_at_sign(name: str):
 
 
 def clean_chat(mids, cid, bot):
+    mids = json.loads(mids)
     try:
         bot.delete_messages(chat_id=cid,
                             message_ids=mids)
