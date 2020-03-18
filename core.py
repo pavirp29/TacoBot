@@ -8,9 +8,9 @@ from handlers.setup import self_kick_handler, new_chat_handler
 from handlers.tacotransfers import chat_reply_handler, taco_mention_handler, tacoinflator
 
 
-bot_token = config('BOT_TOKEN')
-api_id = config('API_ID', cast=int)
-api_hash = config('API_HASH')
+bot_token = "834106268:AAH4J5QVNhU2JLkKBH2jJKfgu0a6plqMRms"
+api_id = int("1357199")
+api_hash = "0b0a0f8728cf1132cbcd341d2f67c9f2"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.getLevelName(config('LOG_LEVEL', default='INFO')))
