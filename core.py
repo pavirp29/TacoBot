@@ -8,7 +8,7 @@ from handlers.setup import self_kick_handler, new_chat_handler
 from handlers.tacotransfers import chat_reply_handler, taco_mention_handler, tacoinflator
 
 
-bot_token = "834106268:AAH4J5QVNhU2JLkKBH2jJKfgu0a6plqMRms"
+bot_token = "1129899267:AAF2mDJYIAT4uclNGdO0f2j7lRtxVVbI6LM"
 api_id = int("1357199")
 api_hash = "0b0a0f8728cf1132cbcd341d2f67c9f2"
 
